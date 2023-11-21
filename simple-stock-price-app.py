@@ -1,5 +1,6 @@
 import yfinance as yf
 import streamlit as st
+import requests
 
 st.write("""
 # Simple Stock Price App
@@ -16,8 +17,14 @@ try:
     tickerData = yf.Ticker(tickerSymbol)
     # Get the historical prices for this ticker
     tickerDf = tickerData.history(period='1d', start='2010-05-31', end='2020-05-31')
-except yf.errors.YFinanceError as e:
-    st.error(f"An error occurred: {e}")
+except yf.errors.YFinanceError as yf_error:
+    st.error(f"An error occurred while fetching data from yfinance: {yf_error}")
+    st.stop()
+except requests.exceptions.RequestException as req_error:
+    st.error(f"An error occurred in the request to yfinance: {req_error}")
+    st.stop()
+except Exception as e:
+    st.error(f"An unexpected error occurred: {e}")
     st.stop()
 
 # Open High Low Close Volume Dividends Stock Splits
